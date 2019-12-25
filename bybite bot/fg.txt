@@ -1,0 +1,205 @@
+public  double PlaceActiveOrdersLow(string url, Makejson makejson, Authorization authorization)
+        {
+
+            bool againplaceorder = true;
+            int Count = 0;
+            var OrderStatus = "";
+            placeorder = new PlaceOrder
+            {
+                api_key = api,
+                qty = ContractQty.ToString(),
+                side = "Buy",
+                symbol = symbol,
+                order_type = "Market",
+                time_in_force = "GoodTillCancel",
+                sign = sign
+            };
+            url = placeorder.CreateRequest(authorization);//задаем путь запроса
+            makejson.post = placeorder;
+            var response = HTTP.Post(makejson.send(), url);
+            PlaceOrderResult result = Makeclass< PlaceOrderResult>.Get(response);
+            double Price = result.price;
+           
+            if (RSI_LOW_COUNT_ORDER > 0)
+            {
+                Console.WriteLine("–ешили отменить все активыне ордера");
+                CancelAllActiveOrder cancelorder = new CancelAllActiveOrder();
+                url = cancelorder.CreateRequest(authorization);//задаем путь запроса
+                makejson.post = cancelorder;
+                response = HTTP.Post(makejson.send(), url);
+                Console.WriteLine("ќтменили все ордера");
+            //    Price = ((ContractQty * LAST_RSI_LOW_AVERAGE * RSI_LOW_COUNT_ORDER) + (ContractQty * Price)) / (ContractQty + ContractQty * RSI_LOW_COUNT_ORDER);
+            }
+            RSI_LOW_COUNT_ORDER++;
+            Price += FirstContract;
+                for (int i = 0;i < RSI_LOW_COUNT_ORDER; i++) {
+                while (againplaceorder && Count<20) {
+                    againplaceorder = false;
+                    placeorder = new PlaceOrder
+                    {
+                        api_key = api,
+                        qty = (ContractQty).ToString(),
+                        side = "Sell",
+                        symbol = symbol,
+                        price = Price.ToString(),
+                        order_type = "Limit",
+                        time_in_force = "GoodTillCancel",
+                        sign = sign
+                    };
+                    url = placeorder.CreateRequest(authorization);//задаем путь запроса
+                    makejson.post = placeorder;
+                    response = HTTP.Post(makejson.send(), url);
+
+                    PlaceOrderRoot placeOrderRoot = Makeclass<PlaceOrderRoot>.Get(response);
+
+
+                    var temp_order_id = placeOrderRoot.result.order_id;
+
+                    GetActiveOrderRealTime getOrder = new GetActiveOrderRealTime
+                    {
+                        api_key = api,
+                        order_id = temp_order_id,
+                        symbol = symbol,
+                        sign = sign
+                    };
+
+                    var p = HTTP.Get(getOrder.CreateRequest(authorization));
+                    GetActiveOrderRealTimeRoot ResultGetOrder = Makeclass<GetActiveOrderRealTimeRoot>.Get(p);
+                    try
+                    {
+                        OrderStatus = ResultGetOrder.result.order_status;
+                    }
+                    catch
+                    {
+                        Console.WriteLine("чето пошло не так, наверное врем€");
+                        againplaceorder = true;
+                        //закрываем позицию по идее и все остальное. начинаем заново
+                    }
+                    if (OrderStatus == "Cancelled")
+                    {
+                        Console.WriteLine("не успели выставить ордер, идем с шагом 0.5");
+                        againplaceorder = true;
+                        Price += 0.5;
+                        Count++;
+                    }
+
+
+                    }
+                if(Count >= 20)
+                {
+                    //¬ызвать здесь закрытие позиции
+                    //
+                    Console.WriteLine("Ѕольше 20 итераций");
+                    break;
+                }
+                    Price += ContractStep;
+                }
+          //  System.Threading.Thread.Sleep(1000);
+            return Price - ContractStep;
+        }
+		   double PlaceActiveOrdersHigh(Authorization authorization)
+        {
+            bool againplaceorder = true;
+            int Count = 0;
+            var OrderStatus = "";
+            placeorder = new PlaceOrder
+            {
+                api_key = api,
+                qty = ContractQty.ToString(),
+                side = "Sell",
+                symbol = symbol,
+                order_type = "Market",
+                time_in_force = "GoodTillCancel",
+                sign = sign
+            };
+            url = placeorder.CreateRequest(authorization);//задаем путь запроса
+           
+            var response = HTTP.Post(Makejson.Convert(placeorder), url);
+
+            PlaceOrderRoot OrderTemp = Makeclass<PlaceOrderRoot>.Get(response);
+
+            double Price = OrderTemp.result.price;
+
+            Console.WriteLine("RSI_HIGH_COUNT_ORDER = " + RSI_HIGH_COUNT_ORDER);
+
+            if (RSI_HIGH_COUNT_ORDER > 0)
+            {
+                Console.WriteLine("–ешили отменить все активные ордера");
+                CancelAllActiveOrder cancelorder = new CancelAllActiveOrder();
+                url = cancelorder.CreateRequest(authorization);//задаем путь запроса
+      
+                response = HTTP.Post(Makejson.Convert(cancelorder), url);
+                Console.WriteLine("отменили все активыне ордера");
+                
+            }
+
+            RSI_HIGH_COUNT_ORDER++;
+
+            Price -= FirstContract;
+
+            for (int i = 0; i < RSI_HIGH_COUNT_ORDER; i++)
+            {
+                while (againplaceorder && Count < 20)
+                {
+                    againplaceorder = false;
+                    placeorder = new PlaceOrder
+                    {
+                        api_key = api,
+                        qty = (ContractQty).ToString(),
+                        side = "Buy",
+                        symbol = symbol,
+                        price = Price.ToString(),
+                        order_type = "Limit",
+                        time_in_force = "PostOnly",
+                        sign = sign
+                    };
+
+
+                    url = placeorder.CreateRequest(authorization);//задаем путь запроса
+                    response = HTTP.Post(Makejson.Convert(placeorder), url);
+
+                    PlaceOrderRoot placeOrderRoot = Makeclass<PlaceOrderRoot>.Get(response);
+
+                    var temp_order_id = placeOrderRoot.result.order_id;
+
+                    GetActiveOrderRealTime getOrder = new GetActiveOrderRealTime
+                    {
+                        api_key = api,
+                        order_id = temp_order_id,
+                        symbol = symbol,
+                        sign = sign
+                    };
+
+                    string getOrderjson = getOrder.CreateRequest(authorization);
+                    var getOrderResponse = HTTP.Get(getOrderjson);
+                    GetActiveOrderRealTimeRoot ResultGetOrder = Makeclass<GetActiveOrderRealTimeRoot>.Get(getOrderResponse);
+
+                    if (ResultGetOrder.ret_code != 0)
+                    {
+                        againplaceorder = true;
+                        throw new Exception("„то-то пошло не так при получении значени€ ActiveOrderRealTime. отправленный запрос - " + getOrderjson + " ; полученный запрос - " + getOrderResponse);
+                    }
+
+                    OrderStatus = ResultGetOrder.result.order_status;
+                    if (OrderStatus == "Cancelled")
+                    {
+                        Console.WriteLine("не успели выставить ордер, идем с шагом 0.5");
+                        againplaceorder = true;
+                        Price -= 0.5;
+                        Count++;
+                    }
+
+
+                }
+                if (Count >= 20)
+                {
+                    ClosePosition(authorization);//«акрытие позиции
+
+                    Console.WriteLine("Ѕольше 20 итераций");
+                    return Price + ContractStep;
+                }
+                Price -= ContractStep;
+            }
+    
+            return Price + ContractStep;
+        }
