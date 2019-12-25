@@ -48,7 +48,7 @@ namespace bybite_bot
             {
                 Console.WriteLine(e);
                 Console.ReadLine();
-                return;
+         //       return;
             }
             // scheme.TestResponse(authorization, "7566");
              Parse_RSI parse = new Parse_RSI();
