@@ -38,7 +38,7 @@ namespace bybite_bot
 
             Authorization authorization = new Authorization(apikey, secret);
             PlaceOrder placeorder = new PlaceOrder();
-            Makejson makejson = new Makejson();
+           // Makejson makejson = new Makejson();
 
             placeorder.side = "Sell";
             placeorder.symbol = "BTCUSD";
@@ -48,8 +48,8 @@ namespace bybite_bot
             placeorder.time_in_force = "GoodTillCancel";
 
             url = placeorder.CreateRequest(authorization);//задаем путь запроса
-            makejson.post = placeorder;
-            var ty = HTTP.Post(makejson.send(), url);
+           // makejson.post = placeorder;
+            var ty = HTTP.Post(Makejson.Convert(placeorder), url);
 
             QueryActiveOrder queryActiveOrder = new QueryActiveOrder();
             queryActiveOrder.symbol = "BTCUSD";
