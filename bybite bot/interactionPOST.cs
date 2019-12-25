@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace bybite_bot
 {
-    
+    //хуй
     class Post//Родительский класс для POST запросов
     {
         
