@@ -47,7 +47,7 @@ namespace bybite_bot
             placeorder.price = "8083";
             placeorder.time_in_force = "GoodTillCancel";
 
-            url = placeorder.CreateRequest(authorization);//задаем путь запроса
+            url = placeorder.CreateRequest(authorization, 0);//задаем путь запроса
            // makejson.post = placeorder;
             var ty = HTTP.Post(Makejson.Convert(placeorder), url);
 
@@ -55,7 +55,7 @@ namespace bybite_bot
             queryActiveOrder.symbol = "BTCUSD";
             queryActiveOrder.order_id = "569fbea4-42a9-4ad8-9514-6a1ae7abf7bb";
 
-            var t = HTTP.Get(queryActiveOrder.CreateRequest(authorization));
+            var t = HTTP.Get(queryActiveOrder.CreateRequest(authorization, 0));
 
 
             //  string url = placeorder.CreateRequest(authorization);//задаем путь запроса

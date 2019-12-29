@@ -24,10 +24,10 @@ namespace bybite_bot
 
     public Authorization authorization;
 
-        public string CreateRequest(Authorization authorization)
+        public string CreateRequest(Authorization authorization, int TimeValue)
         {
             api_key = authorization.apikey;
-            timestamp = GetTimeStamp.ReturnTime();
+            timestamp = GetTimeStamp.ReturnTime(TimeValue);
 
             //sign = authorization.GetSign(CreateParamStr());
             sign = authorization.GetSign(CreateParamStr());
@@ -67,10 +67,10 @@ namespace bybite_bot
 
         public Authorization authorization;
 
-        public string CreateRequest(Authorization authorization)
+        public string CreateRequest(Authorization authorization, int TimeValue)
         {
             api_key = authorization.apikey;
-            timestamp = GetTimeStamp.ReturnTime();
+            timestamp = GetTimeStamp.ReturnTime(TimeValue);
 
             sign = authorization.GetSign(CreateParamStr());
             return "/v2/private/order/create";
@@ -110,10 +110,10 @@ namespace bybite_bot
 
         public Authorization authorization;
 
-        public string CreateRequest(Authorization authorization)
+        public string CreateRequest(Authorization authorization, int TimeValue)
         {
             api_key = authorization.apikey;
-            timestamp = GetTimeStamp.ReturnTime();
+            timestamp = GetTimeStamp.ReturnTime(TimeValue);
 
             //sign = authorization.GetSign(CreateParamStr());
             sign = authorization.GetSign(CreateParamStr());
@@ -141,10 +141,10 @@ namespace bybite_bot
 
         public Authorization authorization;
 
-        public string CreateRequest(Authorization authorization)
+        public string CreateRequest(Authorization authorization, int TimeValue)
         {
             api_key = authorization.apikey;
-            timestamp = GetTimeStamp.ReturnTime();
+            timestamp = GetTimeStamp.ReturnTime(TimeValue);
 
             //sign = authorization.GetSign(CreateParamStr());
             sign = authorization.GetSign(CreateParamStr());
@@ -176,10 +176,10 @@ namespace bybite_bot
 
         public Authorization authorization;
 
-        public string CreateRequest(Authorization authorization)
+        public string CreateRequest(Authorization authorization, int TimeValue)
         {
             api_key = authorization.apikey;
-            timestamp = GetTimeStamp.ReturnTime();
+            timestamp = GetTimeStamp.ReturnTime(TimeValue);
 
             //sign = authorization.GetSign(CreateParamStr());
             sign = authorization.GetSign(CreateParamStr());

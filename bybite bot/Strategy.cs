@@ -149,7 +149,7 @@ namespace bybite_bot
                 sign = sign
             };
 
-            url = placeorder.CreateRequest(authorization);//задаем путь запроса
+            url = placeorder.CreateRequest(authorization, TimeValue);//задаем путь запроса
             //получаем ответ от выставленных контрактов
             var response = HTTP.Post(Makejson.Convert(placeorder), url);
 
@@ -163,7 +163,7 @@ namespace bybite_bot
             {
                 // Console.WriteLine("Решили отменить все активыне ордера");
                 CancelAllActiveOrder cancelorder = new CancelAllActiveOrder();
-                url = cancelorder.CreateRequest(authorization);//задаем путь запроса
+                url = cancelorder.CreateRequest(authorization, TimeValue);//задаем путь запроса
                 response = HTTP.Post(Makejson.Convert(cancelorder), url);
                 Console.WriteLine("Отменили все ордера");
             }
@@ -191,7 +191,7 @@ namespace bybite_bot
                         sign = sign
                     };
 
-                    url = placeorder.CreateRequest(authorization);//задаем путь запроса
+                    url = placeorder.CreateRequest(authorization, TimeValue);//задаем путь запроса
                     response = HTTP.Post(Makejson.Convert(placeorder), url);
 
                     PlaceOrderRoot placeOrderRoot = Makeclass<PlaceOrderRoot>.Get(response);
@@ -206,7 +206,7 @@ namespace bybite_bot
                         symbol = symbol,
                         sign = sign
                     };
-                    string getOrderjson = getOrder.CreateRequest(authorization);
+                    string getOrderjson = getOrder.CreateRequest(authorization, TimeValue);
                     var getOrderResponse = HTTP.Get(getOrderjson);
                     GetActiveOrderRealTimeRoot ResultGetOrder = Makeclass<GetActiveOrderRealTimeRoot>.Get(getOrderResponse);
                     if (ResultGetOrder.ret_code != 0)
@@ -243,114 +243,6 @@ namespace bybite_bot
             return SetPrice(Price, ContractStep, position, 2);
         }
 
-        /* double PlaceActiveOrdersHigh(Authorization authorization)
-         {
-             bool againplaceorder = true;
-             int Count = 0;
-             var OrderStatus = "";
-             placeorder = new PlaceOrder
-             {
-                 api_key = api,
-                 qty = ContractQty.ToString(),
-                 side = "Sell",
-                 symbol = symbol,
-                 order_type = "Market",
-                 time_in_force = "GoodTillCancel",
-                 sign = sign
-             };
-             url = placeorder.CreateRequest(authorization);//задаем путь запроса
-
-             var response = HTTP.Post(Makejson.Convert(placeorder), url);
-
-             PlaceOrderRoot OrderTemp = Makeclass<PlaceOrderRoot>.Get(response);
-
-             double Price = OrderTemp.result.price;
-
-             Console.WriteLine("RSI_HIGH_COUNT_ORDER = " + RSI_HIGH_COUNT_ORDER);
-
-             if (RSI_HIGH_COUNT_ORDER > 0)
-             {
-                 Console.WriteLine("Решили отменить все активные ордера");
-                 CancelAllActiveOrder cancelorder = new CancelAllActiveOrder();
-                 url = cancelorder.CreateRequest(authorization);//задаем путь запроса
-
-                 response = HTTP.Post(Makejson.Convert(cancelorder), url);
-                 Console.WriteLine("отменили все активыне ордера");
-
-             }
-
-             RSI_HIGH_COUNT_ORDER++;
-
-             Price -= FirstContract;
-
-             for (int i = 0; i < RSI_HIGH_COUNT_ORDER; i++)
-             {
-                 while (againplaceorder && Count < 20)
-                 {
-                     againplaceorder = false;
-                     placeorder = new PlaceOrder
-                     {
-                         api_key = api,
-                         qty = (ContractQty).ToString(),
-                         side = "Buy",
-                         symbol = symbol,
-                         price = Price.ToString(),
-                         order_type = "Limit",
-                         time_in_force = "PostOnly",
-                         sign = sign
-                     };
-
-
-                     url = placeorder.CreateRequest(authorization);//задаем путь запроса
-                     response = HTTP.Post(Makejson.Convert(placeorder), url);
-
-                     PlaceOrderRoot placeOrderRoot = Makeclass<PlaceOrderRoot>.Get(response);
-
-                     var temp_order_id = placeOrderRoot.result.order_id;
-
-                     GetActiveOrderRealTime getOrder = new GetActiveOrderRealTime
-                     {
-                         api_key = api,
-                         order_id = temp_order_id,
-                         symbol = symbol,
-                         sign = sign
-                     };
-
-                     string getOrderjson = getOrder.CreateRequest(authorization);
-                     var getOrderResponse = HTTP.Get(getOrderjson);
-                     GetActiveOrderRealTimeRoot ResultGetOrder = Makeclass<GetActiveOrderRealTimeRoot>.Get(getOrderResponse);
-
-                     if (ResultGetOrder.ret_code != 0)
-                     {
-                         againplaceorder = true;
-                         throw new Exception("Что-то пошло не так при получении значения ActiveOrderRealTime. отправленный запрос - " + getOrderjson + " ; полученный запрос - " + getOrderResponse);
-                     }
-
-                     OrderStatus = ResultGetOrder.result.order_status;
-                     if (OrderStatus == "Cancelled")
-                     {
-                         Console.WriteLine("не успели выставить ордер, идем с шагом 0.5");
-                         againplaceorder = true;
-                         Price -= 0.5;
-                         Count++;
-                     }
-
-
-                 }
-                 if (Count >= 20)
-                 {
-                     ClosePosition(authorization);//Закрытие позиции
-
-                     Console.WriteLine("Больше 20 итераций");
-                     return Price + ContractStep;
-                 }
-                 Price -= ContractStep;
-             }
-
-             return Price + ContractStep;
-         }
-         */
-
 
         public void PrintConstants()
         {
@@ -381,7 +273,7 @@ namespace bybite_bot
             //     Console.WriteLine(" cycle : " + cycle);
         }
 
-        public void TestResponse(Authorization authorization, string Price)
+        public void TestResponse(Authorization authorization, string Price, Constants constants)
         {
 
             string OrderStatus = "";
@@ -401,7 +293,7 @@ namespace bybite_bot
                 sign = sign
             };
 
-            url = placeorder.CreateRequest(authorization);//задаем путь запроса
+            url = placeorder.CreateRequest(authorization, TimeValue);//задаем путь запроса
 
             var response = HTTP.Post(Makejson.Convert(placeorder), url);
 
@@ -418,7 +310,7 @@ namespace bybite_bot
                 sign = sign
             };
 
-            var p = HTTP.Get(getOrder.CreateRequest(authorization));
+            var p = HTTP.Get(getOrder.CreateRequest(authorization, TimeValue));
             GetActiveOrderRealTimeRoot ResultGetOrder = Makeclass<GetActiveOrderRealTimeRoot>.Get(p);
             OrderStatus = ResultGetOrder.result.order_status;
 
@@ -449,12 +341,12 @@ namespace bybite_bot
             RSI_LOW_COUNT_ORDER = 0;
             //отменяем все ордера
             CancelAllActiveOrder cancelorder = new CancelAllActiveOrder();
-            url = cancelorder.CreateRequest(authorization);//задаем путь запроса
+            url = cancelorder.CreateRequest(authorization, TimeValue);//задаем путь запроса
 
             string response = HTTP.Post(Makejson.Convert(cancelorder), url);
             //Получаем значение позиции
             GetMyPosition getPosition = new GetMyPosition { symbol = symbol };
-            string getPositionRequest = getPosition.CreateRequest(authorization);
+            string getPositionRequest = getPosition.CreateRequest(authorization, TimeValue);
             string getPositionResponse = HTTP.Get(getPositionRequest);
             GetMyPositionRoot ResultGetPosition = Makeclass<GetMyPositionRoot>.Get(getPositionResponse);
             if (ResultGetPosition.ret_code != 0)
@@ -475,7 +367,7 @@ namespace bybite_bot
                 sign = sign
             };
 
-            url = placeorder.CreateRequest(authorization);//задаем путь запроса
+            url = placeorder.CreateRequest(authorization, TimeValue);//задаем путь запроса
 
             var responseOrder = HTTP.Post(Makejson.Convert(placeorder), url);
             PlaceOrderRoot OrderTemp1 = Makeclass<PlaceOrderRoot>.Get(responseOrder);
@@ -536,6 +428,8 @@ namespace bybite_bot
             }
             return 1;
         }
+
+        
 
     }
 

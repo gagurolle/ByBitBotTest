@@ -13,7 +13,8 @@ using System.Security.Cryptography;
 namespace bybite_bot
 {// const string url = ;
     class Program
-    {       
+    {
+        
         public static string TimeStamp;
         public static string apikey = "7r3TSAIjPbhCwrUV0c";
         public static string secret = "tL4nqJ5pjkoiXnVh0piupPTSUWgPg2iEcHmK";
@@ -27,7 +28,7 @@ namespace bybite_bot
 
         static void Main(string[] args)
         {
-
+            
             string rsi = "";
             string average = "";
             string url = "";
@@ -40,6 +41,7 @@ namespace bybite_bot
             
             string temp = scheme.api;
             Authorization authorization = new Authorization(scheme.api, scheme.secret);
+            scheme.SetTimeValue(authorization);
             try
             {
                 scheme.ClosePosition(authorization);

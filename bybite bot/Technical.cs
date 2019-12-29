@@ -67,8 +67,26 @@ namespace bybite_bot
         public static bool      orderflagLow             = false;
         public static bool      orderflagHigh           = false;
 
+        public int TimeValue = 0;
+
         public static PlaceOrder placeorder;
 
+        public void SetTimeValue(Authorization authorization)
+        {
+            for (int i = 0; i < 10; i++) {
+                GetMyPosition getPosition = new GetMyPosition { symbol = symbol };
+                string getPositionRequest = getPosition.CreateRequest(authorization, i);
+                string getPositionResponse = HTTP.Get(getPositionRequest);
+                GetMyPositionRoot ResultGetPosition = Makeclass<GetMyPositionRoot>.Get(getPositionResponse);
+                if (ResultGetPosition.ret_code == 0)
+                {
+                    TimeValue = i;
+                    Console.WriteLine("Шаг времени = " + i);
+                    return;
+                }
+            }
+            throw new Exception("Ошибка синхонизации времени с сервером");
+        }
 
         public void ReadFile()
         {
@@ -109,9 +127,9 @@ namespace bybite_bot
     abstract class GetTimeStamp//Получение текущего времени
     {
         public static string TimeStamp { get; set; }
-        public static string ReturnTime()
+        public static string ReturnTime(int TimeValue)
         {
-            int TimeStamps = Convert.ToInt32((Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds) + 1;
+            int TimeStamps = Convert.ToInt32((Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds) + TimeValue;
             TimeStamp = TimeStamps + "000";
             return TimeStamp;
         }
