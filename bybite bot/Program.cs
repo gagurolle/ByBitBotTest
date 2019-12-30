@@ -56,13 +56,13 @@ namespace bybite_bot
                 try {
                     try
                     {
-                        //  rsi = parse.GetValueRSI();
-                        // average = parse.GetValueAverage();
+                          rsi = parse.GetValueRSI();
+                         average = parse.GetValueAverage();
 
-                        Console.WriteLine("rsi - ");
-                        rsi = Console.ReadLine();
-                        Console.WriteLine("average - ");
-                        average = Console.ReadLine();
+                       // Console.WriteLine("rsi - ");
+                      //  rsi = Console.ReadLine();
+                      //  Console.WriteLine("average - ");
+                      //  average = Console.ReadLine();
                     }
                     catch (Exception e)
                     {
