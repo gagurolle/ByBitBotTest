@@ -66,8 +66,8 @@ namespace bybite_bot
         public static double LAST_RSI_HIGH_PRICE_BUY         = 0;        
         public static bool      orderflagLow             = false;
         public static bool      orderflagHigh           = false;
-        public static bool ReloadPage = false;
-        public static int ReloadPageTime = 10000;
+        public bool ReloadPage = false;
+        public int ReloadPageTime = 10000;
         public int TimeValue = 0;
 
         public static PlaceOrder placeorder;
