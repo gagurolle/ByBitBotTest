@@ -130,8 +130,10 @@ namespace bybite_bot
 
         }
 
+        
         public double PlaceActiveOrders(Authorization authorization, string position)
         {
+            Console.WriteLine();
             SetPositionConstants(position);
 
             bool againplaceorder = true;
@@ -161,7 +163,7 @@ namespace bybite_bot
             //Если выставляем лимитный ордер не в первый раз - отменяем сначала все активные ордера
             if (RSI_TEMP_COUNT_ORDER > 0)
             {
-                // Console.WriteLine("Решили отменить все активыне ордера");
+               
                 CancelAllActiveOrder cancelorder = new CancelAllActiveOrder();
                 url = cancelorder.CreateRequest(authorization, TimeValue);//задаем путь запроса
                 response = HTTP.Post(Makejson.Convert(cancelorder), url);
@@ -170,7 +172,7 @@ namespace bybite_bot
 
             RSI_TEMP_COUNT_ORDER++;//Увеличили количество выставленных ордеров на 1, потому что сейчас выставим ордера
 
-            // Price += FirstContract;
+           
             Price = SetPrice(Price, FirstContract, position, 1);//Выставляем ордер от той цены позиции 
 
 
@@ -209,6 +211,9 @@ namespace bybite_bot
                     string getOrderjson = getOrder.CreateRequest(authorization, TimeValue);
                     var getOrderResponse = HTTP.Get(getOrderjson);
                     GetActiveOrderRealTimeRoot ResultGetOrder = Makeclass<GetActiveOrderRealTimeRoot>.Get(getOrderResponse);
+
+                    Console.WriteLine("Не успеели выставить ,идем еще ниже - "+Count);
+
                     if (ResultGetOrder.ret_code != 0)
                     {
                         againplaceorder = true;
@@ -216,11 +221,12 @@ namespace bybite_bot
                     }
 
                     OrderStatus = ResultGetOrder.result.order_status;
+
+                    Console.WriteLine("Цена ордера, который мы выставили - " + ResultGetOrder.result.price);
                     if (OrderStatus == "Cancelled")
                     {
                         Console.WriteLine("не успели выставить ордер, идем с шагом 0.5");
                         againplaceorder = true;
-                        // Price -= 0.5;
                         Price = SetPrice(Price, 0.5, position, 2);
                         Count++;
                     }
@@ -235,11 +241,12 @@ namespace bybite_bot
                 }
                 //Price += ContractStep;
                 Price = SetPrice(Price, ContractStep, position, 1);
+                Console.WriteLine("--итерация выставленного ордера:" + i + ";Всего нужно выставить:" + RSI_TEMP_COUNT_ORDER);
             }
             //  System.Threading.Thread.Sleep(1000);
 
             SetPositionConstants(position);
-
+            Console.WriteLine();
             return SetPrice(Price, ContractStep, position, 2);
         }
 
@@ -270,7 +277,6 @@ namespace bybite_bot
             Console.WriteLine("symbol : " + symbol);
             Console.WriteLine("orderflagLow : " + orderflagLow);
             Console.WriteLine("orderflagHigh : " + orderflagHigh);
-            //     Console.WriteLine(" cycle : " + cycle);
         }
 
         public void TestResponse(Authorization authorization, string Price, Constants constants)
@@ -278,12 +284,10 @@ namespace bybite_bot
 
             string OrderStatus = "";
             string url = "";
-            //   Makejson makejson = new Makejson();
 
             placeorder = new PlaceOrder
             {
                 api_key = api,
-                //close_on_trigger = "true",
                 qty = (ContractQty).ToString(),
                 side = "Sell",
                 symbol = symbol,
@@ -316,18 +320,8 @@ namespace bybite_bot
 
             if (OrderStatus == "Cancelled")
             {
-                //Price -= 0.5;
                 Console.WriteLine("STOP");
-
-
             }
-            // var p = HTTP.Get(getOrder.CreateRequest(authorization));
-
-            //      if (result.ret_code == -1)
-            {
-                //    var i = 0;
-            }
-
         }
 
         public void ClosePosition(Authorization authorization)//Закрытие позиции

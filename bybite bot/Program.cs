@@ -11,29 +11,15 @@ using System.Text;
 using System.Security.Cryptography;
 
 namespace bybite_bot
-{// const string url = ;
+{
     class Program
-    {
-        
-        public static string TimeStamp;
-        public static string apikey = "7r3TSAIjPbhCwrUV0c";
-        public static string secret = "tL4nqJ5pjkoiXnVh0piupPTSUWgPg2iEcHmK";
-        public static string GetString;
-        public static string side;
-        public static string symbol;
-        public static string order_type;
-        public static string qty;
-        public static string price;
-        public static string time_in_force;
-
+    {        
         static void Main(string[] args)
         {
             
             string rsi = "";
             string average = "";
             string url = "";
-
-            //Constants constants = new Constants();
            
             BTC_RSI_Scheme scheme = new BTC_RSI_Scheme();
 
@@ -50,46 +36,47 @@ namespace bybite_bot
             {
                 Console.WriteLine(e);
                 Console.ReadLine();
-         //       return;
             }
-            // scheme.TestResponse(authorization, "7566");
              Parse_RSI parse = new Parse_RSI();
 
-            Console.WriteLine("");
               Console.WriteLine("");
               Console.WriteLine("");
-              Console.WriteLine("BOT V0.5|TestByBit");
+              Console.WriteLine("");
+              Console.WriteLine("BOT V0.7|TestByBit");
               Console.WriteLine("");
               Console.WriteLine("");
+
               System.Threading.Thread.Sleep(5000);
+
               int k = 0;
               int l = 0;          
+
                   while (true)
             {
                 try {
-                    //throw new Exception("Тестовая ошибка");
                     try
                     {
-                         rsi = parse.GetValueRSI();
-                         average = parse.GetValueAverage();
-                       // Console.WriteLine("rsi - ");
-                        //rsi = Console.ReadLine();
-                        //Console.WriteLine("average - ");
-                        //average = Console.ReadLine();
+                        //  rsi = parse.GetValueRSI();
+                        // average = parse.GetValueAverage();
+
+                        Console.WriteLine("rsi - ");
+                        rsi = Console.ReadLine();
+                        Console.WriteLine("average - ");
+                        average = Console.ReadLine();
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine("Произошла очередная ошибка считывания с сайта||" + DateTime.UtcNow.ToString());
                         continue;
                     }
-                    if (k == 300)
+                    if (k == 3000)
                     {
                         Console.WriteLine(rsi + "||" + average + "||" + DateTime.UtcNow.ToString());
                         k = 0;
                     }
-                    if (l == 6001)
+                    if (l == scheme.ReloadPageTime && scheme.ReloadPage)
                     {
-                     //   parse.ReloadPage();
+                        parse.ReloadPage();
                         Console.WriteLine("Страница была перезагружена||" + DateTime.UtcNow.ToString());
                         System.Threading.Thread.Sleep(100);
                         l = 0;
