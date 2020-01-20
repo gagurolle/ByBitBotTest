@@ -47,7 +47,7 @@ namespace bybite_bot
               Console.WriteLine("");
               Console.WriteLine("");
               Console.WriteLine("");
-              Console.WriteLine("BOT V0.811|TestByBit");
+              Console.WriteLine("BOT V0.812|TestByBit");
               Console.WriteLine("");
               Console.WriteLine("");
 
@@ -76,7 +76,7 @@ namespace bybite_bot
                     }
                     if (k == 2000)
                     {
-                        Console.WriteLine(rsi + "||" + average + "||" + DateTime.UtcNow.ToString());
+                        //Console.WriteLine(rsi + "||" + average + "||" + DateTime.UtcNow.ToString());
                         k = 0;
                     }
                     if (l == scheme.ReloadPageTime && scheme.ReloadPage)

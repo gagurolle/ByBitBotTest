@@ -118,7 +118,7 @@ namespace bybite_bot
         public string order_margin { get; set; }
         public string wallet_balance { get; set; }
         public string realised_pnl { get; set; }
-        public int unrealised_pnl { get; set; }
+       // public string unrealised_pnl { get; set; }
         public string cum_realised_pnl { get; set; }
         public int cross_seq { get; set; }
         public int position_seq { get; set; }
