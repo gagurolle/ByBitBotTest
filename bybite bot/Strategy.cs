@@ -70,6 +70,27 @@ namespace bybite_bot
             //Выходим из позиции при достижении цены последнего лимитного ордера, выставленного с НИЖНЕГО RSI
             if (orderflagLow == true && average >= LAST_RSI_LOW_AVERAGE && rsi > LAST_RSI_LOW)
             {
+
+                Console.WriteLine("Предполагаем, что закрыли позицию по лимитным ордерам. Начинаем проверку позиции||" + DateTime.UtcNow.ToString());
+                GetMyPosition getPosition = new GetMyPosition { symbol = symbol };
+                string getPositionRequest = getPosition.CreateRequest(authorization, TimeValue);
+                string getPositionResponse = HTTP.Get(getPositionRequest);
+                GetMyPositionRoot ResultGetPosition = Makeclass<GetMyPositionRoot>.Get(getPositionResponse);
+                if (ResultGetPosition.ret_code != 0)
+                {
+                    Console.WriteLine("Не смогли нормально обработать доступ к позиции. ОШИБКА");
+                    return;
+                }
+                else
+                {
+                    if(ResultGetPosition.result.size == 0){
+                        Console.WriteLine("Позиция закрыта, обнуляем переменные");
+                    }
+                    else { Console.WriteLine("Позиция не закрыта. Количество контрактов в позиции - " + ResultGetPosition.result.size);
+                        Console.WriteLine("Цена - " + ResultGetPosition.result.entry_price);
+                    }
+                }
+
                 Console.WriteLine("Продали лимтные ордера с LOW||" + DateTime.UtcNow.ToString());
                 Console.WriteLine("LAST_RSI_LOW = {0}||orderflagLow={1}||LAST_RSI_LOW_AVERAGE={2}", LAST_RSI_LOW, orderflagLow, LAST_RSI_LOW_AVERAGE);
                 orderflagLow = false;
@@ -114,16 +135,36 @@ namespace bybite_bot
             if (orderflagHigh == true && average <= LAST_RSI_HIGH_AVERAGE && rsi < LAST_RSI_HIGH)
             {
 
-                orderflagHigh = false;
+                Console.WriteLine("Предполагаем, что закрыли позицию по лимитным ордерам. Начинаем проверку позиции||" + DateTime.UtcNow.ToString());
+                GetMyPosition getPosition = new GetMyPosition { symbol = symbol };
+                string getPositionRequest = getPosition.CreateRequest(authorization, TimeValue);
+                string getPositionResponse = HTTP.Get(getPositionRequest);
+                GetMyPositionRoot ResultGetPosition = Makeclass<GetMyPositionRoot>.Get(getPositionResponse);
+                if (ResultGetPosition.ret_code != 0)
+                {
+                    Console.WriteLine("Не смогли нормально обработать доступ к позиции. ОШИБКА");
+                    return;
+                }
+                else
+                {
+                    if (ResultGetPosition.result.size == 0)
+                    {
+                        Console.WriteLine("Позиция закрыта, обнуляем переменные");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Позиция не закрыта. Количество контрактов в позиции - " + ResultGetPosition.result.size);
+                        Console.WriteLine("Цена - " + ResultGetPosition.result.entry_price);
+                    }
+                }
 
+                Console.WriteLine("Купили лимтные ордера с HIGH||" + DateTime.UtcNow.ToString());
+                Console.WriteLine("LAST_RSI_HIGH = {0}||orderflagHigh={1}||LAST_RSI_HIGH_AVERAGE={2}||RSI_HIGH_COUNT_ORDER={3}", LAST_RSI_HIGH, orderflagHigh, LAST_RSI_HIGH_AVERAGE, RSI_HIGH_COUNT_ORDER);
+                orderflagHigh = false;
                 LAST_RSI_HIGH_AVERAGE = 0;
                 LAST_RSI_HIGH = 100;
                 RSI_HIGH_COUNT_ORDER = 0;
                 RSI_LOW_COUNT_ORDER = 0;
-
-                Console.WriteLine("Купили лимтные ордера с HIGH||" + DateTime.UtcNow.ToString());
-                Console.WriteLine("LAST_RSI_HIGH = {0}||orderflagHigh={1}||LAST_RSI_HIGH_AVERAGE={2}||RSI_HIGH_COUNT_ORDER={3}", LAST_RSI_HIGH, orderflagHigh, LAST_RSI_HIGH_AVERAGE, RSI_HIGH_COUNT_ORDER);
-
                 Console.WriteLine("RSI = " + rsi + ", average = " + average);
                 return;
             }
@@ -139,6 +180,7 @@ namespace bybite_bot
             bool againplaceorder = true;
             int Count = 0;
             var OrderStatus = "";
+            string LastLimitPrice = "";
             //Выставляем контракт по рынку
             placeorder = new PlaceOrder
             {
@@ -211,9 +253,9 @@ namespace bybite_bot
                     string getOrderjson = getOrder.CreateRequest(authorization, TimeValue);
                     var getOrderResponse = HTTP.Get(getOrderjson);
                     GetActiveOrderRealTimeRoot ResultGetOrder = Makeclass<GetActiveOrderRealTimeRoot>.Get(getOrderResponse);
-
-                    Console.WriteLine("Не успеели выставить ,идем еще ниже - "+Count);
-
+                    if (Count != 0) {
+                        Console.WriteLine("Не успеели выставить ,идем еще ниже - " + Count);
+                    }
                     if (ResultGetOrder.ret_code != 0)
                     {
                         againplaceorder = true;
@@ -221,8 +263,10 @@ namespace bybite_bot
                     }
 
                     OrderStatus = ResultGetOrder.result.order_status;
+                    
 
                     Console.WriteLine("Цена ордера, который мы выставили - " + ResultGetOrder.result.price);
+                    Console.WriteLine("Статус выставленного оордера - " + OrderStatus);
                     if (OrderStatus == "Cancelled")
                     {
                         Console.WriteLine("не успели выставить ордер, идем с шагом 0.5");
@@ -230,6 +274,7 @@ namespace bybite_bot
                         Price = SetPrice(Price, 0.5, position, 2);
                         Count++;
                     }
+                    LastLimitPrice = ResultGetOrder.result.price;
                 }
                 if (Count >= 20)
                 {
@@ -239,11 +284,17 @@ namespace bybite_bot
                     //return Price - ContractStep;
                     return SetPrice(Price, ContractStep, position, 2);
                 }
-                //Price += ContractStep;
-                Price = SetPrice(Price, ContractStep, position, 1);
+                else
+                {
+                    Console.WriteLine("Могла бы быть такая цена - " + SetPrice(Price, ContractStep, position, 1));
+                    Price = double.Parse(LastLimitPrice, CultureInfo.InvariantCulture);
+                    Console.WriteLine("Но сейчас такая цена последняя выставленного ордера по запросу GET - "+Price);
+                }
+                
+               // Price = SetPrice(Price, ContractStep, position, 1);
                 Console.WriteLine("--итерация выставленного ордера:" + i + ";Всего нужно выставить:" + RSI_TEMP_COUNT_ORDER);
             }
-            //  System.Threading.Thread.Sleep(1000);
+
 
             SetPositionConstants(position);
             Console.WriteLine();
@@ -279,37 +330,45 @@ namespace bybite_bot
             Console.WriteLine("orderflagHigh : " + orderflagHigh);
         }
 
-        public void TestResponse(Authorization authorization, string Price, Constants constants)
+        public void TestResponse(Authorization authorization)
         {
 
-            string OrderStatus = "";
-            string url = "";
-
+            Console.WriteLine();
+            GetMyPosition getPosition = new GetMyPosition { symbol = symbol };
+            string getPositionRequest = getPosition.CreateRequest(authorization, TimeValue);
+            string getPositionResponse = HTTP.Get(getPositionRequest);
+            GetMyPositionRoot ResultGetPosition = Makeclass<GetMyPositionRoot>.Get(getPositionResponse);
+            Console.ReadLine();
+            bool againplaceorder = true;
+            int Count = 0;
+            var OrderStatus = "";
+            //Выставляем контракт по рынку
             placeorder = new PlaceOrder
             {
                 api_key = api,
-                qty = (ContractQty).ToString(),
-                side = "Sell",
+                qty = ContractQty.ToString(),
+                side = TempSide,
                 symbol = symbol,
-                price = Price,
-                order_type = "Limit",
-                time_in_force = "PostOnly",
+                order_type = "Market",
+                time_in_force = "GoodTillCancel",
                 sign = sign
             };
 
             url = placeorder.CreateRequest(authorization, TimeValue);//задаем путь запроса
-
+            //получаем ответ от выставленных контрактов
             var response = HTTP.Post(Makejson.Convert(placeorder), url);
 
-            PlaceOrderRoot result = Makeclass<PlaceOrderRoot>.Get(response);
+            PlaceOrderRoot OrderRoot = Makeclass<PlaceOrderRoot>.Get(response);
+
+            //Получаем цену ,по которой вошли в позицию
+         //   double Price = OrderRoot.result.price;
 
 
-            var temp_order_id = result.result.order_id;
 
             GetActiveOrderRealTime getOrder = new GetActiveOrderRealTime
             {
                 api_key = api,
-                order_id = temp_order_id,
+       //         order_id = temp_order_id,
                 symbol = symbol,
                 sign = sign
             };

@@ -13,8 +13,8 @@ namespace bybite_bot
         //Запросы ввиде GET должны быть представлены в виде x-www-form-urlencoded
         public static string Get(string paramstr)
         {
-            var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://api-testnet.bybit.com"+paramstr);
-            Console.WriteLine("https://api-testnet.bybit.com"+paramstr);
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://api.bybit.com"+paramstr);
+            Console.WriteLine("https://api.bybit.com"+paramstr);
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "GET";
             var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
@@ -27,8 +27,8 @@ namespace bybite_bot
         //Запросы типа POST  должны быть представлены в виде JSON
         public static string Post(string json, string url)
         {
-           // string siteurl = "https://api-testnet.bybit.com/" + url;
-            var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://api-testnet.bybit.com"+url);
+           // string siteurl = "https://api.bybit.com/" + url;
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create("https://api.bybit.com"+url);
 
             httpWebRequest.ContentType = "application/json";
             httpWebRequest.Method = "POST";

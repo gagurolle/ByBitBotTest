@@ -37,12 +37,17 @@ namespace bybite_bot
                 Console.WriteLine(e);
                 Console.ReadLine();
             }
+
+            //Для теста
+            //scheme.TestResponse(authorization);
+            //Для теста
+
              Parse_RSI parse = new Parse_RSI();
 
               Console.WriteLine("");
               Console.WriteLine("");
               Console.WriteLine("");
-              Console.WriteLine("BOT V0.7|TestByBit");
+              Console.WriteLine("BOT V0.811|TestByBit");
               Console.WriteLine("");
               Console.WriteLine("");
 
@@ -69,7 +74,7 @@ namespace bybite_bot
                         Console.WriteLine("Произошла очередная ошибка считывания с сайта||" + DateTime.UtcNow.ToString());
                         continue;
                     }
-                    if (k == 3000)
+                    if (k == 2000)
                     {
                         Console.WriteLine(rsi + "||" + average + "||" + DateTime.UtcNow.ToString());
                         k = 0;
@@ -82,6 +87,7 @@ namespace bybite_bot
                         l = 0;
                     }
                     scheme.SetValueStack(rsi, average, authorization);
+                    //scheme.
                     System.Threading.Thread.Sleep(scheme.SleepValue);
                     k++;
                     l++;
