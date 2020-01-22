@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace bybite_bot
-{
+{//Классы для принятия ответов от сайта 
     public class Root { }
     public class RootObject
     {

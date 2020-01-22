@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 
 namespace bybite_bot
 {
-    //хуй
     class Post//Родительский класс для POST запросов
     {
         
@@ -16,11 +15,11 @@ namespace bybite_bot
 
     class PlaceLeverage:Post//Отправить ордер
     {
-        public string api_key            { get; set; }
+        public string api_key                { get; set; }
         public string leverage               { get; set; }
-        public string symbol              { get; set; }
-        public string timestamp { get; set; }
-        public string sign { get; set; }
+        public string symbol                 { get; set; }
+        public string timestamp              { get; set; }
+        public string sign                   { get; set; }
 
     public Authorization authorization;
 
@@ -101,12 +100,12 @@ namespace bybite_bot
 
     class CancelActiveOrder : Post//Отправить ордер
     {
-        public string api_key { get; set; }
-        public string order_id { get; set; }
+        public string api_key       { get; set; }
+        public string order_id      { get; set; }
         public string order_link_id { get; set; }
-        public string symbol { get; set; }
-        public string timestamp { get; set; }
-        public string sign { get; set; }
+        public string symbol        { get; set; }
+        public string timestamp     { get; set; }
+        public string sign          { get; set; }
 
         public Authorization authorization;
 
@@ -134,10 +133,10 @@ namespace bybite_bot
 
     class CancelAllActiveOrder : Post//Отправить ордер
     {
-        public string api_key { get; set; }
+        public string api_key       { get; set; }
         public string symbol = "BTCUSD";
-        public string timestamp { get; set; }
-        public string sign { get; set; }
+        public string timestamp     { get; set; }
+        public string sign          { get; set; }
 
         public Authorization authorization;
 
@@ -166,13 +165,13 @@ namespace bybite_bot
 
     class ReplaceOrder : Post//Отправить ордер
     {
-        public string api_key { get; set; }
-        public string order_id { get; set; }
-        public string p_r_price { get; set; }
-        public string p_r_qty { get; set; }
-        public string symbol { get; set; }
-        public string timestamp { get; set; }
-        public string sign { get; set; }
+        public string api_key       { get; set; }
+        public string order_id      { get; set; }
+        public string p_r_price     { get; set; }
+        public string p_r_qty       { get; set; }
+        public string symbol        { get; set; }
+        public string timestamp     { get; set; }
+        public string sign          { get; set; }
 
         public Authorization authorization;
 

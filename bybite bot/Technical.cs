@@ -46,24 +46,24 @@ namespace bybite_bot
         public string leverage           { get; set; }
         public double ContractStep      { get; set; }
         public int       ContractQty        { get; set; }
-        public double RSI_LOW            { get; set; }
-        public double RSI_HIGH          { get; set; }
-        public  double RSI_LOW_STEP     { get; set; }
-        public  double RSI_HIGH_STEP    { get; set; }
+        public double MAC_LOW            { get; set; }
+        public double MAC_HIGH          { get; set; }
+        public  double MAC_LOW_STEP     { get; set; }
+        public  double MAC_HIGH_STEP    { get; set; }
         public  string symbol           { get; set; }
         public int           SleepValue           { get; set; }
         public int           FirstContract { get; set; }
         public static string AvailableBalance { get; set; }
         public static double LastLongValue { get; set; }
         public static double LastShortValue { get; set; }
-        public static double LAST_RSI_LOW                    = 0;
-        public static double LAST_RSI_LOW_AVERAGE            = 0;
-        public static double LAST_RSI_LOW_PRICE_BUY          = 0;
-        public static int    RSI_LOW_COUNT_ORDER             = 0;
-        public int           RSI_HIGH_COUNT_ORDER            = 0;
-        public static double LAST_RSI_HIGH                   = 0;
-        public static double LAST_RSI_HIGH_AVERAGE           = 0;
-        public static double LAST_RSI_HIGH_PRICE_BUY         = 0;        
+        public static double LAST_MAC_LOW                    = 0;
+        public static double LAST_MAC_LOW_AVERAGE            = 0;
+        public static double LAST_MAC_LOW_PRICE_BUY          = 0;
+        public static int    MAC_LOW_COUNT_ORDER             = 0;
+        public int           MAC_HIGH_COUNT_ORDER            = 0;
+        public static double LAST_MAC_HIGH                   = 0;
+        public static double LAST_MAC_HIGH_AVERAGE           = 0;
+        public static double LAST_MAC_HIGH_PRICE_BUY         = 0;        
         public static bool      orderflagLow             = false;
         public static bool      orderflagHigh           = false;
         public bool ReloadPage = false;
@@ -113,11 +113,11 @@ namespace bybite_bot
                           
             ContractStep = ty.ContractStep;
             ContractQty = ty.ContractQty;
-            RSI_LOW = ty.RSI_LOW;
-            RSI_HIGH = ty.RSI_HIGH;
+            MAC_LOW = ty.MAC_LOW;
+            MAC_HIGH = ty.MAC_HIGH;
                           
-            RSI_LOW_STEP = ty.RSI_LOW_STEP;
-            RSI_HIGH_STEP = ty.RSI_HIGH_STEP;
+            MAC_LOW_STEP = ty.MAC_LOW_STEP;
+            MAC_HIGH_STEP = ty.MAC_HIGH_STEP;
             symbol = ty.symbol;
             SleepValue = ty.SleepValue;
             secret = ty.secret;

@@ -8,5 +8,6 @@ namespace bybite_bot
 {
     class FileLog
     {
+        //будущее
     }
 }

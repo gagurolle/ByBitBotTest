@@ -15,23 +15,21 @@ using System.Threading.Tasks;
 
 namespace bybite_bot
 {
-    class BTC_RSI_Scheme : Constants
+    class BTC_MAC_Scheme : Constants
     {
         string url = "";
-        double rsi = 0;//текущее значение RSI
+        double rsi = 0;//текущее значение MAC
         double average = 0;//Текущее значение цены
         double price = 0;
         bool positionEnd = false;
-        int RSI_TEMP_COUNT_ORDER = 0;
+        int MAC_TEMP_COUNT_ORDER = 0;
         string TempSide = "";
 
-        public void SetValueStack(string RSI, string AVERAGE, Authorization authorization)
+        public void SetValueStack(string MAC, string AVERAGE, Authorization authorization)
         {
-
-
             try
             {
-                rsi = double.Parse(RSI, CultureInfo.InvariantCulture);
+                rsi = double.Parse(MAC, CultureInfo.InvariantCulture);
                 average = double.Parse(AVERAGE, CultureInfo.InvariantCulture);
             }
             catch (System.FormatException e)
@@ -41,138 +39,15 @@ namespace bybite_bot
                 return;
             }
 
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //Переходим НИЖНЮЮ границу RSI в первый раз
-            if (rsi < RSI_LOW && orderflagLow == false && orderflagHigh == false)
-            {
-                price = PlaceActiveOrders(authorization, "Low");
-                LAST_RSI_LOW = rsi;
-                LAST_RSI_LOW_AVERAGE = price;
-                orderflagLow = true;
-                Console.WriteLine("Перешли границу RSI_LOW||" + DateTime.UtcNow.ToString());
-                Console.WriteLine("LAST_RSI_LOW = {0}||orderflagLow={1}||LAST_RSI_LOW_AVERAGE={2}", LAST_RSI_LOW, orderflagLow, LAST_RSI_LOW_AVERAGE);
-                Console.WriteLine("RSI = " + rsi + ", average = " + average);
-                return;
-            }
-
-            //Ушли дальше от НИЖНЕЙ границы на заданный шаг
-            if (rsi < (LAST_RSI_LOW - RSI_LOW_STEP) && average < LAST_RSI_LOW_AVERAGE && orderflagLow == true)
-            {
-                price = PlaceActiveOrders(authorization, "Low");
-                LAST_RSI_LOW_AVERAGE = price;
-                LAST_RSI_LOW = rsi;
-                Console.WriteLine("Опустились еще ниже RSI_LOW||" + DateTime.UtcNow.ToString());
-                Console.WriteLine("LAST_RSI_LOW = {0}||orderflagLow={1}||LAST_RSI_LOW_AVERAGE={2}", LAST_RSI_LOW, orderflagLow, LAST_RSI_LOW_AVERAGE);
-
-                Console.WriteLine("RSI = " + rsi + ", average = " + average);
-                return;
-            }
-            //Выходим из позиции при достижении цены последнего лимитного ордера, выставленного с НИЖНЕГО RSI
-            if (orderflagLow == true && average >= LAST_RSI_LOW_AVERAGE && rsi > LAST_RSI_LOW)
-            {
-
-                Console.WriteLine("Предполагаем, что закрыли позицию по лимитным ордерам. Начинаем проверку позиции||" + DateTime.UtcNow.ToString());
-                GetMyPosition getPosition = new GetMyPosition { symbol = symbol };
-                string getPositionRequest = getPosition.CreateRequest(authorization, TimeValue);
-                string getPositionResponse = HTTP.Get(getPositionRequest);
-                GetMyPositionRoot ResultGetPosition = Makeclass<GetMyPositionRoot>.Get(getPositionResponse);
-                if (ResultGetPosition.ret_code != 0)
-                {
-                    Console.WriteLine("Не смогли нормально обработать доступ к позиции. ОШИБКА");
-                    return;
-                }
-                else
-                {
-                    if(ResultGetPosition.result.size == 0){
-                        Console.WriteLine("Позиция закрыта, обнуляем переменные");
-                    }
-                    else { Console.WriteLine("Позиция не закрыта. Количество контрактов в позиции - " + ResultGetPosition.result.size);
-                        Console.WriteLine("Цена - " + ResultGetPosition.result.entry_price);
-                    }
-                }
-
-                Console.WriteLine("Продали лимтные ордера с LOW||" + DateTime.UtcNow.ToString());
-                Console.WriteLine("LAST_RSI_LOW = {0}||orderflagLow={1}||LAST_RSI_LOW_AVERAGE={2}", LAST_RSI_LOW, orderflagLow, LAST_RSI_LOW_AVERAGE);
-                orderflagLow = false;
-                LAST_RSI_LOW_AVERAGE = 0;
-                LAST_RSI_LOW = 0;
-                RSI_HIGH_COUNT_ORDER = 0;
-                RSI_LOW_COUNT_ORDER = 0;
-                Console.WriteLine("RSI = " + rsi + ", average = " + average);
-                return;
-            }
-            /////////////////////////////////////////////////////////////////////////////////////////////////
-
-            //Переходим ВЕРХНЮЮ границу RSI в первый раз
-            if (rsi > RSI_HIGH && orderflagHigh == false && orderflagLow == false && RSI_HIGH_COUNT_ORDER == 0)
-            {
-                price = PlaceActiveOrders(authorization, "High");
-                LAST_RSI_HIGH = rsi;
-                LAST_RSI_HIGH_AVERAGE = price;
-                orderflagHigh = true;
-
-                Console.WriteLine("Перешли границу RSI_HIGH||" + DateTime.UtcNow.ToString());
-                Console.WriteLine("LAST_RSI_HIGH = {0}||orderflagHIGH={1}||LAST_RSI_HIGH_AVERAGE={2}||RSI_HIGH_COUNT_ORDER={3}", LAST_RSI_HIGH, orderflagHigh, LAST_RSI_HIGH_AVERAGE, RSI_HIGH_COUNT_ORDER);
-                Console.WriteLine("RSI = " + rsi + ", average = " + average);
-
-                return;
-            }
-            //Ушли дальше от ВЕРХНЕЙ границы на заданный шаг
-            if (rsi > (LAST_RSI_HIGH + RSI_HIGH_STEP) && average > LAST_RSI_HIGH_AVERAGE && orderflagHigh == true)
-            {
-                price = PlaceActiveOrders(authorization, "High");
-
-                LAST_RSI_HIGH_AVERAGE = price;
-                LAST_RSI_HIGH = rsi;
-
-                Console.WriteLine("Поднялись выше RSI_HIGH||" + DateTime.UtcNow.ToString());
-                Console.WriteLine("LAST_RSI_HIGH = {0}||orderflagHigh={1}||LAST_RSI_HIGH_AVERAGE={2}||RSI_HIGH_COUNT_ORDER={3}", LAST_RSI_HIGH, orderflagHigh, LAST_RSI_HIGH_AVERAGE, RSI_HIGH_COUNT_ORDER);
-                Console.WriteLine("RSI = " + rsi + ", average = " + average);
-
-                return;
-            }
-            //Выходим из позиции при достижении цены последнего лимитного ордера, выставленного с ВЕРХНЕГО RSI
-            if (orderflagHigh == true && average <= LAST_RSI_HIGH_AVERAGE && rsi < LAST_RSI_HIGH)
-            {
-
-                Console.WriteLine("Предполагаем, что закрыли позицию по лимитным ордерам. Начинаем проверку позиции||" + DateTime.UtcNow.ToString());
-                GetMyPosition getPosition = new GetMyPosition { symbol = symbol };
-                string getPositionRequest = getPosition.CreateRequest(authorization, TimeValue);
-                string getPositionResponse = HTTP.Get(getPositionRequest);
-                GetMyPositionRoot ResultGetPosition = Makeclass<GetMyPositionRoot>.Get(getPositionResponse);
-                if (ResultGetPosition.ret_code != 0)
-                {
-                    Console.WriteLine("Не смогли нормально обработать доступ к позиции. ОШИБКА");
-                    return;
-                }
-                else
-                {
-                    if (ResultGetPosition.result.size == 0)
-                    {
-                        Console.WriteLine("Позиция закрыта, обнуляем переменные");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Позиция не закрыта. Количество контрактов в позиции - " + ResultGetPosition.result.size);
-                        Console.WriteLine("Цена - " + ResultGetPosition.result.entry_price);
-                    }
-                }
-
-                Console.WriteLine("Купили лимтные ордера с HIGH||" + DateTime.UtcNow.ToString());
-                Console.WriteLine("LAST_RSI_HIGH = {0}||orderflagHigh={1}||LAST_RSI_HIGH_AVERAGE={2}||RSI_HIGH_COUNT_ORDER={3}", LAST_RSI_HIGH, orderflagHigh, LAST_RSI_HIGH_AVERAGE, RSI_HIGH_COUNT_ORDER);
-                orderflagHigh = false;
-                LAST_RSI_HIGH_AVERAGE = 0;
-                LAST_RSI_HIGH = 100;
-                RSI_HIGH_COUNT_ORDER = 0;
-                RSI_LOW_COUNT_ORDER = 0;
-                Console.WriteLine("RSI = " + rsi + ", average = " + average);
-                return;
-            }
+            //////////////////////////////////////////////
+            //ЗДЕСЬ БЫЛА ОПРЕДЕЛЕННАЯ ЛОГИКА ПРИЛОЖЕНИЯ//
+            /////////////////////////////////////////////
+            
 
         }
 
         
-        public double PlaceActiveOrders(Authorization authorization, string position)
+        public double PlaceActiveOrders(Authorization authorization, string position)//Выставить активный ордер
         {
             Console.WriteLine();
             SetPositionConstants(position);
@@ -203,7 +78,7 @@ namespace bybite_bot
             double Price = OrderRoot.result.price;
 
             //Если выставляем лимитный ордер не в первый раз - отменяем сначала все активные ордера
-            if (RSI_TEMP_COUNT_ORDER > 0)
+            if (MAC_TEMP_COUNT_ORDER > 0)
             {
                
                 CancelAllActiveOrder cancelorder = new CancelAllActiveOrder();
@@ -212,13 +87,13 @@ namespace bybite_bot
                 Console.WriteLine("Отменили все ордера");
             }
 
-            RSI_TEMP_COUNT_ORDER++;//Увеличили количество выставленных ордеров на 1, потому что сейчас выставим ордера
+            MAC_TEMP_COUNT_ORDER++;//Увеличили количество выставленных ордеров на 1, потому что сейчас выставим ордера
 
            
             Price = SetPrice(Price, FirstContract, position, 1);//Выставляем ордер от той цены позиции 
 
 
-            for (int i = 0; i < RSI_TEMP_COUNT_ORDER; i++)//Пытаемся выставить лимитные ордера
+            for (int i = 0; i < MAC_TEMP_COUNT_ORDER; i++)//Пытаемся выставить лимитные ордера
             {
                 while (againplaceorder && Count < 20)//Если цена пошла быстрее чем мы выставили ордер, то начинаем спамить с определенным шагом
                 {
@@ -292,7 +167,7 @@ namespace bybite_bot
                 }
                 
                // Price = SetPrice(Price, ContractStep, position, 1);
-                Console.WriteLine("--итерация выставленного ордера:" + i + ";Всего нужно выставить:" + RSI_TEMP_COUNT_ORDER);
+                Console.WriteLine("--итерация выставленного ордера:" + i + ";Всего нужно выставить:" + MAC_TEMP_COUNT_ORDER);
             }
 
 
@@ -311,18 +186,18 @@ namespace bybite_bot
             Console.WriteLine("AvailableBalance : " + AvailableBalance);
             Console.WriteLine("ContractStep : " + ContractStep);
             Console.WriteLine("ContractQty : " + ContractQty);
-            Console.WriteLine("RSI_LOW : " + RSI_LOW);
-            Console.WriteLine("LAST_RSI_LOW : " + LAST_RSI_LOW);
-            Console.WriteLine("RSI_LOW_COUNT_ORDER : " + RSI_LOW_COUNT_ORDER);
-            Console.WriteLine("RSI_HIGH_COUNT_ORDER : " + RSI_HIGH_COUNT_ORDER);
-            Console.WriteLine("LAST_RSI_LOW_AVERAGE : " + LAST_RSI_LOW_AVERAGE);
-            Console.WriteLine("LAST_RSI_LOW_PRICE_BUY : " + LAST_RSI_LOW_PRICE_BUY);
-            Console.WriteLine("RSI_LOW_STEP : " + RSI_LOW_STEP);
-            Console.WriteLine("RSI_HIGH : " + RSI_HIGH);
-            Console.WriteLine("LAST_RSI_HIGH : " + LAST_RSI_HIGH);
-            Console.WriteLine("LAST_RSI_HIGH_AVERAGE  : " + LAST_RSI_HIGH_AVERAGE);
-            Console.WriteLine("LAST_RSI_HIGH_PRICE_BUY : " + LAST_RSI_HIGH_PRICE_BUY);
-            Console.WriteLine("RSI_HIGH_STEP : " + RSI_HIGH_STEP);
+            Console.WriteLine("MAC_LOW : " + MAC_LOW);
+            Console.WriteLine("LAST_MAC_LOW : " + LAST_MAC_LOW);
+            Console.WriteLine("MAC_LOW_COUNT_ORDER : " + MAC_LOW_COUNT_ORDER);
+            Console.WriteLine("MAC_HIGH_COUNT_ORDER : " + MAC_HIGH_COUNT_ORDER);
+            Console.WriteLine("LAST_MAC_LOW_AVERAGE : " + LAST_MAC_LOW_AVERAGE);
+            Console.WriteLine("LAST_MAC_LOW_PRICE_BUY : " + LAST_MAC_LOW_PRICE_BUY);
+            Console.WriteLine("MAC_LOW_STEP : " + MAC_LOW_STEP);
+            Console.WriteLine("MAC_HIGH : " + MAC_HIGH);
+            Console.WriteLine("LAST_MAC_HIGH : " + LAST_MAC_HIGH);
+            Console.WriteLine("LAST_MAC_HIGH_AVERAGE  : " + LAST_MAC_HIGH_AVERAGE);
+            Console.WriteLine("LAST_MAC_HIGH_PRICE_BUY : " + LAST_MAC_HIGH_PRICE_BUY);
+            Console.WriteLine("MAC_HIGH_STEP : " + MAC_HIGH_STEP);
             Console.WriteLine("LastLongValue : " + LastLongValue);
             Console.WriteLine("LastShortValue : " + LastShortValue);
             Console.WriteLine("symbol : " + symbol);
@@ -388,10 +263,10 @@ namespace bybite_bot
             //Makejson makejson = new Makejson();
             //Обнуляем переменные
             orderflagHigh = false;
-            LAST_RSI_HIGH_AVERAGE = 0;
-            LAST_RSI_HIGH = 100;
-            RSI_HIGH_COUNT_ORDER = 0;
-            RSI_LOW_COUNT_ORDER = 0;
+            LAST_MAC_HIGH_AVERAGE = 0;
+            LAST_MAC_HIGH = 100;
+            MAC_HIGH_COUNT_ORDER = 0;
+            MAC_LOW_COUNT_ORDER = 0;
             //отменяем все ордера
             CancelAllActiveOrder cancelorder = new CancelAllActiveOrder();
             url = cancelorder.CreateRequest(authorization, TimeValue);//задаем путь запроса
@@ -438,24 +313,24 @@ namespace bybite_bot
         {
             if (position == "Low" && positionEnd == false)
             {
-                RSI_TEMP_COUNT_ORDER = RSI_LOW_COUNT_ORDER;
+                MAC_TEMP_COUNT_ORDER = MAC_LOW_COUNT_ORDER;
                 TempSide = "Buy";
                 positionEnd = true;
             }
             if (position == "High" && positionEnd == false)
             {
-                RSI_TEMP_COUNT_ORDER = RSI_HIGH_COUNT_ORDER;
+                MAC_TEMP_COUNT_ORDER = MAC_HIGH_COUNT_ORDER;
                 TempSide = "Sell";
                 positionEnd = true;
             }
             if (position == "Low" && positionEnd == true)
             {
-                RSI_LOW_COUNT_ORDER = RSI_TEMP_COUNT_ORDER;
+                MAC_LOW_COUNT_ORDER = MAC_TEMP_COUNT_ORDER;
                 positionEnd = false;
             }
             if (position == "High" && positionEnd == true)
             {
-                RSI_HIGH_COUNT_ORDER = RSI_TEMP_COUNT_ORDER;
+                MAC_HIGH_COUNT_ORDER = MAC_TEMP_COUNT_ORDER;
                 positionEnd = false;
             }
 

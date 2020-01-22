@@ -16,12 +16,14 @@ namespace bybite_bot
     {        
         static void Main(string[] args)
         {
-            
-            string rsi = "";
+            //нужен файл config.txt в корень диска С
+            //чтобы описать все переменные. Должен быть представлен ввиде JSON
+            //также должна быть установлена последняя версия Chrome
+            string mac = "";
             string average = "";
             string url = "";
            
-            BTC_RSI_Scheme scheme = new BTC_RSI_Scheme();
+            BTC_MAC_Scheme scheme = new BTC_MAC_Scheme();
 
             scheme.ReadFile();
             
@@ -42,7 +44,7 @@ namespace bybite_bot
             //scheme.TestResponse(authorization);
             //Для теста
 
-             Parse_RSI parse = new Parse_RSI();
+             Parse_MAC parse = new Parse_MAC();
 
               Console.WriteLine("");
               Console.WriteLine("");
@@ -61,23 +63,15 @@ namespace bybite_bot
                 try {
                     try
                     {
-                          rsi = parse.GetValueRSI();
+                          mac = parse.GetValueMAC();
                          average = parse.GetValueAverage();
 
-                       // Console.WriteLine("rsi - ");
-                      //  rsi = Console.ReadLine();
-                      //  Console.WriteLine("average - ");
-                      //  average = Console.ReadLine();
+    
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine("Произошла очередная ошибка считывания с сайта||" + DateTime.UtcNow.ToString());
                         continue;
-                    }
-                    if (k == 2000)
-                    {
-                        //Console.WriteLine(rsi + "||" + average + "||" + DateTime.UtcNow.ToString());
-                        k = 0;
                     }
                     if (l == scheme.ReloadPageTime && scheme.ReloadPage)
                     {
@@ -86,7 +80,7 @@ namespace bybite_bot
                         System.Threading.Thread.Sleep(100);
                         l = 0;
                     }
-                    scheme.SetValueStack(rsi, average, authorization);
+                    scheme.SetValueStack(mac, average, authorization);
                     //scheme.
                     System.Threading.Thread.Sleep(scheme.SleepValue);
                     k++;

@@ -10,12 +10,12 @@ namespace bybite_bot
 
     class QueryActiveOrder : Get//Узнать активные ордера
     {
-        public string api_key { get; set; }
-        public string order_id { get; set; }
+        public string api_key       { get; set; }
+        public string order_id      { get; set; }
         public string order_link_id { get; set; }
-        public string symbol { get; set; }
-        public string timestamp { get; set; }
-        public string sign { get; set; }
+        public string symbol        { get; set; }
+        public string timestamp     { get; set; }
+        public string sign          { get; set; }
 
         public Authorization authorization;
 
@@ -55,9 +55,9 @@ namespace bybite_bot
         public string order_link_id { get; set; }
         public string order_status  { get; set; }
         public string page          { get; set; }
-        public string symbol { get; set; }
-        public string timestamp { get; set; }
-        public string sign { get; set; }
+        public string symbol        { get; set; }
+        public string timestamp     { get; set; }
+        public string sign          { get; set; }
 
         public Authorization authorization;
 
@@ -91,12 +91,12 @@ namespace bybite_bot
 
     class GetActiveOrderRealTime : Get//Узнать активные ордера
     {
-        public string api_key { get; set; } 
-        public string order_id { get; set; }
+        public string api_key       { get; set; } 
+        public string order_id      { get; set; }
         public string order_link_id { get; set; }
-        public string symbol { get; set; }
-        public string timestamp { get; set; }
-        public string sign { get; set; }
+        public string symbol        { get; set; }
+        public string timestamp     { get; set; }
+        public string sign          { get; set; }
 
         public Authorization authorization;
 
@@ -126,9 +126,9 @@ namespace bybite_bot
 
     class GetUserLeverage
     {
-        public string api_key { get; set; }
-        public string timestamp { get; set; }
-        public string sign { get; set; }
+        public string api_key       { get; set; }
+        public string timestamp     { get; set; }
+        public string sign          { get; set; }
 
         public Authorization authorization;
 
@@ -156,10 +156,10 @@ namespace bybite_bot
 
     class GetMyPosition : Get//Узнать активные ордера
     {
-        public string api_key { get; set; }
-        public string symbol { get; set; }
-        public string timestamp { get; set; }
-        public string sign { get; set; }
+        public string api_key       { get; set; }
+        public string symbol        { get; set; }
+        public string timestamp     { get; set; }
+        public string sign          { get; set; }
 
         public Authorization authorization;
 
